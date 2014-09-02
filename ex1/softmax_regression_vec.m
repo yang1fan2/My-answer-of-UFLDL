@@ -21,14 +21,13 @@ function [f,g] = softmax_regression(theta, X,y)
   f = 0;
   g = zeros(size(theta));
   h = exp(theta' * X);
-  S = sum(h, 1);
-  P = log(h / repmat(S,[num_classes-1 1]));
-  I = sub2ind(size(h), y, 1:m);
+  
+  P = log(bsxfun(@rdivide,h,sum(h)));
+  I = sub2ind(size(P), y, 1:m);
   values = P(I);
-  f = -sum(values);
+  f = -sum(values)/m;
   P(I) = P(I)-1;
-  g = P * X';
-  g = g(:);
+  g = X * P'/m;
   
   %
   % TODO:  Compute the softmax objective function and gradient using vectorized code.
