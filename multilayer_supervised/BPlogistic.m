@@ -1,2 +1,3 @@
-function A = ANNlogistic(X) 
-	A = X+1;
+function factor = BPlogistic(Z,A) 
+	factor = A .* (1-A);
+	

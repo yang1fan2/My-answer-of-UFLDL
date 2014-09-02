@@ -1,4 +1,4 @@
-function [cost,gradient,activeLayer] = ANNsoftmax(X,y)
+function [cost,gradient,activeLayer] = FWBPsoftmax(X,y)
   % X : C * M
   %gradient : C*M
   m=size(X,2);
@@ -19,7 +19,7 @@ function [cost,gradient,activeLayer] = ANNsoftmax(X,y)
   
   %
   % TODO:  Compute the softmax objective function and gradient using vectorized code.
-  %        Store the objective function value in 'f', and the gradient in 'g'.
+  %        Store thez objective function value in 'f', and the gradient in 'g'.
   %        Before returning g, make sure you form it back into a vector with g=g(:);
   %
 %%% YOUR CODE HERE %%%
