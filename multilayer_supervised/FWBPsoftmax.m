@@ -1,6 +1,6 @@
-function [cost,gradient,activeLayer] = softmax_regression(X,y)
+function [cost,gradient,activeLayer] = ANNsoftmax(X,y)
   % X : C * M
-  %gradient : C*1
+  %gradient : C*M
   m=size(X,2);
   n=size(X,1);
 
@@ -15,7 +15,7 @@ function [cost,gradient,activeLayer] = softmax_regression(X,y)
   values = P(I);
   cost = -sum(values);
   P(I) = P(I)-1;
-  gradient = sum(P,2);
+  gradient = P;
   
   %
   % TODO:  Compute the softmax objective function and gradient using vectorized code.

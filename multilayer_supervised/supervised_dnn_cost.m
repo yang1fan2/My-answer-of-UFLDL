@@ -41,15 +41,20 @@ end;
 %% compute cost
 %%% YOUR CODE HERE %%%
 
-[cost, Error,A{indexOutput}] = softmax(Z{indexOutput},labels);
+[cost, Error,A{indexOutput}] = FWBPsoftmax(Z{indexOutput},labels);
 pred_prob = A{indexOutput}
 %% compute gradients using backpropagation
 %%% YOUR CODE HERE %%%
 
 for I = numHidden+1:-1:1
-	gradStack{I}.W = Error * sum(A{I-1},2)';
-	gradStack{I}.b = Error;
-	Error = (stack{I}.W' * Error) * 
+	if (I == 1)
+		gradStack{I}.W = Error * data;
+	else
+		gradStack{I}.W = Error * A{I-1}';
+	end
+	gradStack{I}.b = sum(Error, 2);
+	Error = (stack{I}.W' * Error) * ferval(['BP',ei.activation_fun],)
+
 end
 
 %% compute weight penalty cost and gradient for non-bias terms
