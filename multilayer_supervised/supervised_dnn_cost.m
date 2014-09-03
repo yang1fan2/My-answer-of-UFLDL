@@ -15,12 +15,13 @@ stack = params2stack(theta, ei);
 numHidden = numel(ei.layer_sizes) - 1;
 indexOutput = numHidden + 1;
 A = cell(numHidden+1, 1); % cur * M
-Z = cell(numHidden+1, 1)
+Z = cell(numHidden+1, 1);
 
 gradStack = cell(numHidden+1, 1);
 %% forward prop
 %%% YOUR CODE HERE %%%
 for I = 1:numHidden+1
+
 	if (I ==1)
 		Z{I} = bsxfun(@plus,stack{I}.W * data, stack{I}.b);
 		A{I} = sigmoid(Z{I});
@@ -30,6 +31,8 @@ for I = 1:numHidden+1
 	end
 end
 
+[ceCost, Error,A{indexOutput}] = FWBPsoftmax(Z{indexOutput},labels);
+pred_prob = A{indexOutput};
 
 %% return here if only predictions desired.
 if po
@@ -41,24 +44,36 @@ end;
 %% compute cost
 %%% YOUR CODE HERE %%%
 
-[cost, Error,A{indexOutput}] = FWBPsoftmax(Z{indexOutput},labels);
-pred_prob = A{indexOutput}
+
 %% compute gradients using backpropagation
 %%% YOUR CODE HERE %%%
 
 for I = numHidden+1:-1:1
 	if (I == 1)
-		gradStack{I}.W = Error * data;
+		gradStack{I}.W = Error * data';
 	else
 		gradStack{I}.W = Error * A{I-1}';
 	end
 	gradStack{I}.b = sum(Error, 2);
-	Error = (stack{I}.W' * Error) * ferval(['BP',ei.activation_fun],)
-
+	if (I > 1)
+		Function = ['BP',ei.activation_fun , '(Z{I-1},A{I-1})'];
+		Error = (stack{I}.W' * Error) .* eval(Function);
+	end	
 end
 
 %% compute weight penalty cost and gradient for non-bias terms
 %%% YOUR CODE HERE %%%
+wCost = 0;
+for I = 1:numHidden+1
+	wCost = wCost + ei.lambda * sum(stack{I}.W(:).^2)/2;
+end
+
+cost = wCost + ceCost;
+
+for l = 1:numHidden
+	gradStack{I}.W = gradStack{I}.W + ei.lambda * stack{I}.W;
+end
+
 
 %% reshape gradients into vector
 [grad] = stack2params(gradStack);

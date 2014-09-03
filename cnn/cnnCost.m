@@ -72,10 +72,14 @@ activations = zeros(convDim,convDim,numFilters,numImages);
 activationsPooled = zeros(outputDim,outputDim,numFilters,numImages);
 
 %%% YOUR CODE HERE %%%
+activations = cnnConvolve(filterDim,numFilters,images,Wc,bc);%conv*conv*filter
+
+activationsPooled = cnnPool(poolDim, activations);
 
 % Reshape activations into 2-d matrix, hiddenSize x numImages,
 % for Softmax layer
-activationsPooled = reshape(activationsPooled,[],numImages);
+
+ activationsPooled = reshape(activationsPooled,[],numImages);
 
 %% Softmax Layer
 %  Forward propagate the pooled activations calculated above into a
@@ -89,14 +93,16 @@ probs = zeros(numClasses,numImages);
 
 %%% YOUR CODE HERE %%%
 
+
+
 %%======================================================================
 %% STEP 1b: Calculate Cost
 %  In this step you will use the labels given as input and the probs
 %  calculate above to evaluate the cross entropy objective.  Store your
 %  results in cost.
-
+P = bsxfun(@plus,Wd * activationsPooled, bd);
 cost = 0; % save objective into cost
-
+[cost, Error, probs] = FWBPsoftmax(P, labels);
 %%% YOUR CODE HERE %%%
 
 % Makes predictions given probs and returns without backproagating errors.
@@ -119,6 +125,17 @@ end;
 
 %%% YOUR CODE HERE %%%
 
+
+ % Error: hidden * image
+Error_pool = reshape(Wd' * Error,outputDim,outputDim,numFilters,numImages);
+for I = 1:numFilters
+	for J = 1:numImages
+		Error_conv(:,:,I,J) = (1/poolDim^2) * kron(Error_pool(:,:,I,J),ones(poolDim)); %conv * conv *filter
+	
+	end
+end
+Error_conv = Error_conv .* BPlogistic(0,activations);
+
 %%======================================================================
 %% STEP 1d: Gradient Calculation
 %  After backpropagating the errors above, we can use them to calculate the
@@ -128,6 +145,19 @@ end;
 %  for that filter with each image and aggregate over images.
 
 %%% YOUR CODE HERE %%%
+
+Wd_grad = Error * activationsPooled';
+bd_grad = sum(Error, 2);
+
+for I = 1:numFilters
+	for J = 1:numImages
+		tmp = conv2(images(:,:,J),rot90(Error_conv(:,:,I,J),2),'valid');
+		Wc_grad(:,:,I) =Wc_grad(:,:,I) + tmp;
+	end
+	bc_grad(I) = sum(sum(sum(Error_conv(:,:,I,:))));
+end
+
+
 
 %% Unroll gradient into grad vector for minFunc
 grad = [Wc_grad(:) ; Wd_grad(:) ; bc_grad(:) ; bd_grad(:)];
