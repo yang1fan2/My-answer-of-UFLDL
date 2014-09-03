@@ -29,7 +29,8 @@ end;
 
 imageDim = size(images,1); % height/width of image
 numImages = size(images,3); % number of images
-
+lambda = 0.01;
+numImagesInv =  1/numImages;
 %% Reshape parameters and setup gradient matrices
 
 % Wc is filterDim x filterDim x numFilters parameter matrix
@@ -103,6 +104,9 @@ probs = zeros(numClasses,numImages);
 P = bsxfun(@plus,Wd * activationsPooled, bd);
 cost = 0; % save objective into cost
 [cost, Error, probs] = FWBPsoftmax(P, labels);
+
+A = lambda*(sum(sum(Wd(:).^2))+sum(sum(sum(Wc(:)).^2)))/2;
+cost = cost * numImagesInv + A;
 %%% YOUR CODE HERE %%%
 
 % Makes predictions given probs and returns without backproagating errors.
@@ -146,15 +150,16 @@ Error_conv = Error_conv .* BPlogistic(0,activations);
 
 %%% YOUR CODE HERE %%%
 
-Wd_grad = Error * activationsPooled';
-bd_grad = sum(Error, 2);
+Wd_grad = numImagesInv * Error * activationsPooled' + lambda *Wd;
+bd_grad = sum(Error, 2) * numImagesInv;
 
 for I = 1:numFilters
 	for J = 1:numImages
 		tmp = conv2(images(:,:,J),rot90(Error_conv(:,:,I,J),2),'valid');
 		Wc_grad(:,:,I) =Wc_grad(:,:,I) + tmp;
 	end
-	bc_grad(I) = sum(sum(sum(Error_conv(:,:,I,:))));
+	Wc_grad(:,:,I) = numImagesInv * Wc_grad(:,:,I) + lambda * Wc(:,:,I);
+	bc_grad(I) = numImagesInv * sum(sum(sum(Error_conv(:,:,I,:))));
 end
 
 

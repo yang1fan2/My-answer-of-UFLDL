@@ -60,7 +60,7 @@ if DEBUG
                                 db_numFilters,db_poolDim), db_theta);
  
     % Use this to visually compare the gradients side by side
-    disp([numGrad grad]);
+    %disp([numGrad grad]);
     
     diff = norm(numGrad-grad)/norm(numGrad+grad);
     % Should be small. In our implementation, these values are usually 
