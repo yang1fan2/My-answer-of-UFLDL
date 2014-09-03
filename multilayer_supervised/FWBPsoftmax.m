@@ -23,7 +23,7 @@ function [cost,gradient,activeLayer] = FWBPsoftmax(X,y)
   
   %
   % TODO:  Compute the softmax objective function and gradient using vectorized code.
-  %        Store the objective function value in 'f', and the gradient in 'g'.
+  %        Store thez objective function value in 'f', and the gradient in 'g'.
   %        Before returning g, make sure you form it back into a vector with g=g(:);
   %
 %%% YOUR CODE HERE %%%

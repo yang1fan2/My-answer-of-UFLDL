@@ -4,12 +4,17 @@
 %% setup environment
 % experiment information
 % a struct containing network layer sizes etc
+clear
 ei = [];
 
 % add common directory to your path for
 % minfunc and mnist data helpers
 addpath ../common;
 addpath(genpath('../common/minFunc_2012/minFunc'));
+<<<<<<< HEAD
+=======
+
+>>>>>>> origin/master
 
 %% load mnist data
 [data_train, labels_train, data_test, labels_test] = load_preprocess_mnist();
