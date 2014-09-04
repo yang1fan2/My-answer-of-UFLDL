@@ -29,7 +29,7 @@ end;
 
 imageDim = size(images,1); % height/width of image
 numImages = size(images,3); % number of images
-lambda = 0.01;
+lambda = 0.0001;
 numImagesInv =  1/numImages;
 %% Reshape parameters and setup gradient matrices
 
@@ -102,10 +102,12 @@ probs = zeros(numClasses,numImages);
 %  calculate above to evaluate the cross entropy objective.  Store your
 %  results in cost.
 P = bsxfun(@plus,Wd * activationsPooled, bd);
+%P = bsxfun(@minus, P ,max(P,[],1));
 cost = 0; % save objective into cost
 [cost, Error, probs] = FWBPsoftmax(P, labels);
 
-A = lambda*(sum(sum(Wd(:).^2))+sum(sum(sum(Wc(:)).^2)))/2;
+A = lambda*(sum(Wd(:).^2)+sum(Wc(:).^2))/2;
+
 cost = cost * numImagesInv + A;
 %%% YOUR CODE HERE %%%
 
